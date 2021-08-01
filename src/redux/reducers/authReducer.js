@@ -1,10 +1,10 @@
 import { TYPES } from "../actions/types";
-import { isEmpty } from "lodash";
 
 const initialState = {
   isAuthenticated: false,
   token: localStorage.getItem("token"),
   user: {},
+  errors: [],
 };
 
 const authReducer = (state = initialState, { type, payload }) => {
@@ -12,7 +12,7 @@ const authReducer = (state = initialState, { type, payload }) => {
     case TYPES.SET_CURRENT_USER:
       return {
         ...state,
-        isAuthenticated: !isEmpty(payload),
+        isAuthenticated: true,
         user: payload,
       };
     case TYPES.SUCCESSFUL_REGISTER:
@@ -28,6 +28,19 @@ const authReducer = (state = initialState, { type, payload }) => {
         ...state,
         token: null,
         isAuthenticated: false,
+      };
+    case TYPES.ERRORS:
+      return {
+        ...state,
+        isAuthenticated: false,
+        errors: payload,
+      };
+    case TYPES.AUTH_ERROR:
+      localStorage.removeItem("toekn");
+      return {
+        ...state,
+        isAuthenticated: false,
+        token: null,
       };
     default:
       return state;

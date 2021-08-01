@@ -1,21 +1,38 @@
 import axios from "axios";
+import { getServer } from "../../utils";
+import setAuthToken from "../../utils/setAuthToken";
 
 import { TYPES } from "./types";
 
-export const setCurrentUser = (user) => ({
-  type: TYPES.SET_CURRENT_USER,
-  payload: user,
-});
+// set a user
+export const setCurrentUser = (user) => async (dispatch) => {
+  if (localStorage.token) {
+    setAuthToken(localStorage.token);
+  }
 
-export const register = (user) => (dispatch) => {
+  try {
+    const res = await axios.get(`${getServer}/auth`);
+    dispatch({
+      type: TYPES.SET_CURRENT_USER,
+      payload: res.data,
+    });
+  } catch (error) {
+    dispatch({
+      type: TYPES.AUTH_ERROR,
+    });
+  }
+};
+
+// register user
+export const register = (user) => async (dispatch) => {
   const config = {
     headers: {
       "Content-Type": "application/json",
     },
   };
 
-  axios
-    .post("http:localhost:5000/api/users", user, config)
+  await axios
+    .post(`${getServer}/users`, user, config)
     .then((res) => {
       console.log(res);
       dispatch({
@@ -24,10 +41,17 @@ export const register = (user) => (dispatch) => {
       });
     })
     .catch((err) => {
+      const error = err.response.data.errors;
       console.error(err);
-      dispatch({
-        type: TYPES.FAILURE_REGISTER,
-        payload: err.response.data.errors,
-      });
+      if (error) {
+        dispatch({
+          type: TYPES.ERRORS,
+          payload: error,
+        });
+      } else {
+        dispatch({
+          type: TYPES.FAILURE_REGISTER,
+        });
+      }
     });
 };
