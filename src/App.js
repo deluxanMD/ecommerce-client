@@ -1,15 +1,19 @@
 import React from "react";
+import "./App.css";
 
-import { useSelector } from "react-redux";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+
+// General components
+import Navbar from "./components/general/Navbar";
 
 const App = () => {
-  const auth = useSelector((state) => state.auth);
-
   return (
-    <div>
-      <p>App JS</p>
-      <p>{auth.isAuthenticated.toString()}</p>
-    </div>
+    <Router>
+      <div className="App">
+        <Navbar />
+        <p>App JS</p>
+      </div>
+    </Router>
   );
 };
 
